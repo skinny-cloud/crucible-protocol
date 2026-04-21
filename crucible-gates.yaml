@@ -1,0 +1,245 @@
+# CRUCIBLE Protocol — Machine-Readable Gate Specifications
+# Version: 1.2 | Updated: 2026-04-16
+# Open standard — see ideas/papers/crucible-draft.md for full paper
+# License: MIT
+
+protocol:
+  name: CRUCIBLE
+  version: "1.2"
+  full_name: "Code Review Under Conditions Inducing Bug Latency Exposure"
+  venue_target: "ICSE 2027 SEIP"
+
+gates:
+  - id: G1
+    name: xfail_governance
+    layer: quality
+    empirically_grounded: true
+    priority: P0
+    effort: S
+    description: >
+      Premature xfail removal creates false-green CI signals. An xfail that was
+      added because a test was known to fail cannot be removed until CI confirms
+      the test passes.
+    detection_trigger: "commit removing @xfail, @pytest.mark.xfail, or xit() markers"
+    detection_command: "git diff HEAD~1 HEAD -- '*.py' | grep -E '^-.*@(xfail|pytest\\.mark\\.xfail|skip)'"
+    pass_criterion: "commit message references the CI run ID that confirmed the test passes"
+    fail_criterion: "no CI run reference in commit message"
+    evidence_source: "dx3 AGE rewrite (2026-03-06) — 4 xfails removed based on local results; CI integration tests still failed"
+
+  - id: G2
+    name: non_empty_result_assertions
+    layer: quality
+    empirically_grounded: true
+    priority: P0
+    effort: S
+    description: >
+      Tests that create data and then query it must assert the result is non-empty.
+      An empty list is vacuously the correct type — isinstance(result, list) passes
+      for both success and failure.
+    detection_trigger: "integration, e2e, or database test file that creates data and queries it"
+    detection_command: >
+      grep -n "assert isinstance.*list\|assert result\.success is True\|assert len.*== 0"
+      tests/integration/ tests/e2e/ -- without a following "assert len.*>= 1" or "assert.*non.*empty"
+    pass_criterion: "assertion set includes len(result) >= 1 or equivalent non-empty check"
+    fail_criterion: "only type or boolean assertions, no non-empty check"
+    evidence_source: "dx3 AGE rewrite (2026-03-06) — tests asserted isinstance(result.data, list); empty list passed"
+    related_work:
+      - "[SCHULER-2011] Checked Coverage"
+      - "[VERA-PEREZ-2019] pseudo-tested methods"
+
+  - id: G3
+    name: mock_drift_detection
+    layer: quality
+    empirically_grounded: true
+    priority: P1
+    effort: M
+    description: >
+      When mocks are updated in the same commit as implementation code for the same
+      module, the mocks may be reverse-engineered from the new implementation — making
+      them tautological. The update is valid only if a specification change justifies it.
+    detection_trigger: "commit modifying both implementation files and test fixtures/mocks for the same module"
+    detection_command: >
+      git diff HEAD~1 HEAD --name-only | sort | uniq -d
+      (cross-reference src/ changes with tests/ changes for the same module name)
+    pass_criterion: "commit message references a specification change (NEXUS AC, SPEC.md, API contract)"
+    fail_criterion: "no spec reference; implementation-only change"
+    evidence_source: "dx3 AGE rewrite (2026-03-06) — 5 unit mocks updated in same commit as production rewrite"
+    related_work:
+      - "[BARR-2015] oracle problem"
+      - "[HORA-2018] mock proliferation"
+
+  - id: G4
+    name: test_count_delta_gate
+    layer: quality
+    empirically_grounded: true
+    priority: P1
+    effort: S
+    description: >
+      Test count decreases must be visible and justified. Deleting bad tests is
+      legitimate governance; it must be documented, not hidden. The gate makes
+      test removal an explicit decision, not an invisible side effect.
+    detection_trigger: "CI reports fewer tests than the previous run"
+    detection_command: "compare pytest collection count between current and previous CI run"
+    pass_criterion: "commit message contains [test-delta: -N justified: reason] for decreases > 5"
+    fail_criterion: "decrease > 5 with no justification in commit message"
+    evidence_source: "dx3 AGE rewrite (2026-03-06) — 323 tests vanished undetected between commits"
+    note: "Deleting hollow tests IS good governance. Gate 4 makes the deletion visible and justified, not prevented."
+
+  - id: G5
+    name: silent_exception_audit
+    layer: quality
+    empirically_grounded: true
+    priority: P1
+    effort: M
+    description: >
+      Exception handlers that swallow errors silently prevent failures from propagating
+      to tests. The database can fail; the test never knows. All except blocks must
+      make the error observable: log it, re-raise it, or return an error status.
+    detection_trigger: "except blocks in production code containing only pass or logging without signaling"
+    detection_command: "grep -rn 'except.*:$\\|except Exception:$\\|except Exception as' src/ --include='*.py' | grep -A1 'pass$'"
+    pass_criterion: "error is observable — logged, re-raised, or returned as error status"
+    fail_criterion: "except: pass or except Exception: pass with no logging or re-raise"
+    evidence_source: "dx3 AGE rewrite (2026-03-06) — _store_node_metadata() swallowed NOT NULL constraint violation"
+
+  - id: G6
+    name: mutation_testing
+    layer: quality
+    empirically_grounded: false
+    research_informed: true
+    priority: P2
+    effort: L
+    description: >
+      Tests that survive all mutations prove nothing about the code they cover.
+      Mutation testing provides a quality signal that coverage cannot. Applied
+      to critical paths in mature test suites only (> 500 tests).
+    detection_trigger: "project exceeds 500 tests; applied to critical path modules"
+    tools:
+      python: "mutmut"
+      typescript: "@stryker-mutator/core"
+      rust: "cargo-mutants"
+    pass_criterion:
+      critical_paths: "mutation score >= 60%"
+      standard_code: "mutation score >= 40%"
+    fail_criterion: "mutation score below threshold"
+    deployment: "audit-time check, not CI gate (cost constraint)"
+    related_work:
+      - "[PETROVIC-2018] incremental mutation at Google"
+      - "[WANG-2024] 100% coverage, 4% mutation score (LLM tests)"
+      - "[BERNDT-SEIP-2026] industry adoption survey"
+    note: "Gate 6 is research-informed — no portfolio incident directly triggered it. Labeled explicitly."
+
+  - id: G7
+    name: spec_test_traceability
+    layer: quality
+    empirically_grounded: false
+    research_informed: true
+    priority: P2
+    effort: L
+    description: >
+      Tests derived from implementation rather than specification are structurally
+      unverifiable — they validate what the code does, not what it should do.
+      Integration test assertions must trace to a documented specification.
+      Applied to new tests only; no retrofit burden.
+    detection_trigger: "new integration test assertions"
+    detection_command: "grep -L 'Validates:\\|SPEC:\\|NEXUS:\\|AC-' tests/integration/"
+    pass_criterion: "test docstring contains specification reference (NEXUS initiative ID, SPEC.md section, API contract)"
+    fail_criterion: "no specification reference in docstring"
+    scope: "new tests only — no retrofit"
+    related_work:
+      - "[SCHULER-2011] Checked Coverage"
+      - "[CVT-2026] Circular Validation Trap"
+    note: "Gate 7 is research-informed — no portfolio incident directly triggered it. Labeled explicitly."
+
+  - id: G8
+    name: coverage_integrity_audit
+    layer: measurement_integrity
+    empirically_grounded: true
+    priority: P0
+    effort: M
+    description: >
+      Tests can be perfect; the measurement system can still be rigged. Gate 8 audits
+      the measurement framework itself — coverage configuration, environment gates,
+      integration test mock usage, badge accuracy, and infrastructure reachability.
+      Gate 8 is NEVER self-reported. Independent auditor always.
+    subchecks:
+      - id: "8.1"
+        name: coverage_omit_audit
+        priority: P0
+        description: "Every coverage omit/exclude entry must have an inline comment explaining WHY"
+        detection_command: >
+          grep -n "omit\|exclude\|coveragePathIgnorePatterns\|collectCoverageFrom"
+          pyproject.toml jest.config* vitest.config* .nycrc
+        pass_criterion: "all omit entries have inline # OMIT JUSTIFIED: <reason> comments"
+        fail_criterion: "unjustified omit of business logic, API handlers, ML engines, CLI entry points"
+      - id: "8.2"
+        name: environment_gated_test_audit
+        priority: P0
+        description: "Tests behind environment variables must have those variables set in at least one CI workflow"
+        detection_command: "grep -rn 'skipIf\\|PYTEST_\\|CI_ONLY\\|process.env\\.' tests/ && grep the env var in .github/workflows/"
+        pass_criterion: "every gated test's environment variable appears in at least one CI workflow"
+        fail_criterion: "environment variable never set anywhere in CI — tests are dead code"
+      - id: "8.3"
+        name: integration_test_mock_audit
+        priority: P1
+        description: "Integration and e2e test files must not use mocking frameworks (except documented external services)"
+        detection_command: "grep -rn '@patch\\|MagicMock\\|jest.mock\\|vi.mock\\|sinon.stub' tests/integration/ tests/e2e/"
+        pass_criterion: "zero mocks in integration/e2e test files, or all documented with # MOCK JUSTIFIED: <reason>"
+        fail_criterion: "undocumented mock usage in integration/e2e test file"
+      - id: "8.4"
+        name: badge_accuracy
+        priority: P1
+        description: "README coverage badge must match CI-generated output, not a hardcoded value"
+        detection_command: "compare badge URL source against CI workflow coverage report step"
+        pass_criterion: "badge generated from CI run, not hardcoded shield URL"
+        fail_criterion: "hardcoded badge not matching actual coverage"
+      - id: "8.5"
+        name: coverage_delta_real_number
+        priority: P0
+        description: "Coverage gate must use the number AFTER omit audit, not the configured number"
+        pass_criterion: "coverage percentage reflects actual code coverage including all business logic"
+        fail_criterion: "coverage percentage excludes business logic via unjustified omits"
+      - id: "8.6"
+        name: conftest_infrastructure_mock_audit
+        priority: P0
+        description: >
+          Module-level infrastructure client stubs in conftest.py at root or tests/ level
+          mock the client for ALL tests that import it. This is the structural oracle compromise.
+        detection_command: >
+          grep -n "asyncpg\|psycopg\|redis\|boto3\|elasticsearch\|httpx.AsyncClient"
+          conftest.py tests/conftest.py
+        pass_criterion: "no module-level assignments to infrastructure client names in conftest files"
+        fail_criterion: "asyncpg = AsyncMock() or equivalent at module level in conftest — ALL tests affected"
+      - id: "8.7"
+        name: infrastructure_reachability_check
+        priority: P0
+        description: >
+          For test suites claiming to test database/cache/queue operations, verify
+          the service is actually running. Tests that pass without the service are
+          testing mocks, not infrastructure.
+        detection_command: "pg_isready && redis-cli ping && (tests pass? if yes without service → G8.6 violation)"
+        pass_criterion: "infrastructure service running AND tests exercise it (confirmed by G8.6 clean)"
+        fail_criterion: "service not running AND tests still pass — infrastructure not exercised"
+    independence_requirement: >
+      Gate 8 is never self-reported. The CoS or independent auditor runs all checks.
+      Cross-machine rule: CLX9 CoS audits NXTG-AI work; NXTG-AI CoS audits CLX9 work.
+      The directing agent cannot audit work it directed.
+    evidence_sources:
+      - "Podcast-Pipeline (2026-03-07) — 8.1/8.2/8.3/8.4/8.5 all violated; 77%→15% actual coverage"
+      - "dx3 (2026-03-17) — 8.6/8.7 violated; asyncpg mocked at conftest root; 4,726 tests, 0 real DB coverage"
+
+escalation_taxonomy:
+  - level: 1
+    name: "Accidental quality failure"
+    gates: ["G1", "G2", "G3", "G4", "G5"]
+    intervention: "directive → fix → re-audit (additive)"
+    case_study: "dx3 CS#1 (2026-03-06)"
+  - level: 2
+    name: "Systematic metric manipulation"
+    gates: ["G8.1", "G8.2", "G8.3", "G8.4", "G8.5"]
+    intervention: "Gate 8 audit → configuration remediation → real coverage baseline (subtractive)"
+    case_study: "Podcast-Pipeline CS#2 (2026-03-07)"
+  - level: 3
+    name: "Structural oracle compromise"
+    gates: ["G8.6", "G8.7"]
+    intervention: "architectural remediation → rebuild test infrastructure (structural)"
+    case_study: "dx3 CS#3 (2026-03-17)"

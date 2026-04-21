@@ -1,0 +1,44 @@
+{
+  "generated_at": "2026-04-20T23:58:43.441Z",
+  "source": "CRUCIBLE Figures.html",
+  "renderer": "playwright/chromium@1.57",
+  "dpi": 216,
+  "results": [
+    {
+      "figure": 1,
+      "png": "figure1.png",
+      "pdf": "figure1.pdf",
+      "width_px": 780,
+      "height_px": 659,
+      "png_bytes": 301931,
+      "pdf_bytes": 184564
+    },
+    {
+      "figure": 2,
+      "png": "figure2.png",
+      "pdf": "figure2.pdf",
+      "width_px": 1080,
+      "height_px": 709,
+      "png_bytes": 567518,
+      "pdf_bytes": 191408
+    },
+    {
+      "figure": 3,
+      "png": "figure3.png",
+      "pdf": "figure3.pdf",
+      "width_px": 980,
+      "height_px": 644,
+      "png_bytes": 356599,
+      "pdf_bytes": 243074
+    },
+    {
+      "figure": 4,
+      "png": "figure4.png",
+      "pdf": "figure4.pdf",
+      "width_px": 860,
+      "height_px": 538,
+      "png_bytes": 320580,
+      "pdf_bytes": 195066
+    }
+  ]
+}

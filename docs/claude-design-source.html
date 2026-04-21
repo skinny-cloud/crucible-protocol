@@ -1,0 +1,1541 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>CRUCIBLE Protocol — arXiv figures</title>
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link
+  href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,500;0,8..60,600;1,8..60,400;1,8..60,500&family=JetBrains+Mono:wght@400;500&display=swap"
+  rel="stylesheet"
+/>
+
+<style id="figures-css">
+/* figures.css — shared academic typography + tokens for CRUCIBLE figures */
+
+/* Charter is bundled by most modern systems; fall back through a serif stack
+   that approximates Computer Modern / Times for arXiv reviewers. */
+:root {
+  --fig-serif: "Charter", "Source Serif 4", "Source Serif Pro", "STIX Two Text",
+               "Cambria", "Georgia", Times, "Times New Roman", serif;
+  --fig-mono:  "JetBrains Mono", "IBM Plex Mono", "SF Mono", "Menlo",
+               "Consolas", ui-monospace, monospace;
+
+  /* Okabe-Ito audit-theory palette */
+  --audit-controls:   #1f77b4;   /* Gates 1–5 */
+  --audit-substantive:#ff7f0e;   /* Gates 6–7 */
+  --audit-forensic:   #d62728;   /* Gate 8   */
+
+  --ink:        #101418;
+  --ink-soft:   #3a4048;
+  --ink-muted:  #6b7380;
+  --rule:       #1a1e24;
+  --rule-soft:  #c8cdd4;
+  --rule-faint: #e4e7ec;
+  --tint-blue:   rgba(31,119,180,0.08);
+  --tint-orange: rgba(255,127,14,0.09);
+  --tint-red:    rgba(214,39,40,0.08);
+  --paper:      #fdfdfb;
+}
+
+.fig {
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--fig-serif);
+  font-feature-settings: "onum" 1, "liga" 1, "kern" 1;
+  text-rendering: geometricPrecision;
+  box-sizing: border-box;
+}
+.fig *, .fig *::before, .fig *::after { box-sizing: border-box; }
+
+.fig .mono { font-family: var(--fig-mono); font-feature-settings: "zero" 1; }
+
+/* Figure number + title, ICSE-SEIP style: "Figure 1. Title." */
+.fig-caption {
+  font-family: var(--fig-serif);
+  font-size: 13px;
+  line-height: 1.45;
+  color: var(--ink);
+  padding: 14px 28px 22px;
+  border-top: 1px solid var(--rule-faint);
+  text-wrap: pretty;
+}
+.fig-caption b {
+  font-weight: 600;
+  font-variant: small-caps;
+  letter-spacing: 0.02em;
+}
+.fig-caption em { color: var(--ink-muted); }
+
+/* --- Figure 1: Quality Stack --- */
+.qstack {
+  padding: 40px 56px 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.qstack-title {
+  font-size: 12px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--ink-muted);
+  margin-bottom: 6px;
+  font-variant-numeric: tabular-nums;
+}
+.qlayer {
+  position: relative;
+  border: 1.25px solid var(--rule);
+  padding: 22px 28px 22px 84px;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 12px 28px;
+}
+.qlayer .lnum {
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 64px;
+  border-right: 1.25px solid var(--rule);
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  gap: 2px;
+}
+.qlayer .lnum .roman {
+  font-family: var(--fig-serif);
+  font-size: 26px;
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: 0.02em;
+}
+.qlayer .lnum .lab {
+  font-size: 9px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--ink-muted);
+}
+.qlayer .qname {
+  font-size: 17px;
+  font-weight: 600;
+  letter-spacing: -0.005em;
+}
+.qlayer .qsub {
+  font-size: 13px;
+  color: var(--ink-soft);
+  margin-top: 3px;
+  font-style: italic;
+}
+.qlayer .qrun {
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-muted);
+  margin-top: 4px;
+}
+.qlayer .qrun .mono { letter-spacing: 0; text-transform: none; font-size: 12px; color: var(--ink-soft); }
+
+.qlayer .qgates {
+  display: flex; flex-wrap: wrap; gap: 6px;
+  justify-content: flex-end;
+  max-width: 280px;
+}
+.qchip {
+  font-family: var(--fig-mono);
+  font-size: 11px;
+  padding: 3px 7px;
+  border: 1px solid var(--rule);
+  color: var(--ink);
+  background: var(--paper);
+  white-space: nowrap;
+}
+.qchip.c { border-color: var(--audit-controls); color: var(--audit-controls); }
+.qchip.s { border-color: var(--audit-substantive); color: var(--audit-substantive); }
+.qchip.f { border-color: var(--audit-forensic); color: var(--audit-forensic); }
+.qchip.muted { color: var(--ink-muted); border-style: dashed; }
+
+.qlayer.human { background: var(--paper); }
+.qlayer.crucible { background: var(--paper); }
+.qlayer.ci { background: #fafaf7; }
+
+.qstack-legend {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 18px;
+  margin-top: 8px;
+  padding-top: 14px;
+  border-top: 1px dashed var(--rule-soft);
+}
+.qstack-legend .item {
+  font-size: 12px;
+  color: var(--ink-soft);
+  line-height: 1.4;
+}
+.qstack-legend .item .sw {
+  display: inline-block;
+  width: 10px; height: 10px;
+  margin-right: 7px;
+  vertical-align: baseline;
+  transform: translateY(1px);
+}
+.qstack-legend .item b {
+  font-family: var(--fig-mono);
+  font-weight: 500;
+  font-size: 11px;
+  letter-spacing: 0.04em;
+}
+
+/* --- Figure 2: Escalation Taxonomy --- */
+.esc {
+  padding: 40px 48px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+.esc-head {
+  display: grid;
+  grid-template-columns: 72px 1fr 1fr 1fr;
+  align-items: end;
+  padding-bottom: 16px;
+  border-bottom: 1.25px solid var(--rule);
+  font-size: 11px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--ink-muted);
+}
+.esc-head > div { padding: 0 10px; }
+.esc-row {
+  display: grid;
+  grid-template-columns: 72px 1fr 1fr 1fr;
+  align-items: stretch;
+  border-bottom: 1px solid var(--rule-faint);
+  min-height: 130px;
+}
+.esc-row:last-of-type { border-bottom: 1.25px solid var(--rule); }
+.esc-row > div {
+  padding: 18px 16px;
+}
+.esc-lvl {
+  border-right: 1px dashed var(--rule-soft);
+  display: flex; flex-direction: column; justify-content: center; align-items: center;
+  gap: 4px;
+}
+.esc-lvl .num {
+  font-family: var(--fig-serif);
+  font-size: 38px;
+  font-weight: 400;
+  line-height: 1;
+}
+.esc-lvl .tag {
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--ink-muted);
+}
+.esc-cell h4 {
+  font-size: 13px;
+  font-weight: 600;
+  margin: 0 0 6px 0;
+  letter-spacing: 0.01em;
+}
+.esc-cell .body {
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: var(--ink-soft);
+}
+.esc-cell .detect {
+  display: flex; flex-wrap: wrap; gap: 4px; margin-top: 8px;
+}
+.esc-cell .gate-chip {
+  font-family: var(--fig-mono);
+  font-size: 10.5px;
+  padding: 2px 6px;
+  border: 1px solid currentColor;
+  letter-spacing: 0;
+}
+.esc-case {
+  font-family: var(--fig-mono);
+  font-size: 11px;
+  color: var(--ink-muted);
+  margin-top: 8px;
+}
+.esc-case .dot {
+  display: inline-block;
+  width: 6px; height: 6px; border-radius: 50%;
+  background: currentColor;
+  vertical-align: middle;
+  margin-right: 6px; transform: translateY(-1px);
+}
+
+.esc-row.l1 { background: linear-gradient(90deg, var(--tint-blue) 0 72px, transparent 72px); }
+.esc-row.l2 { background: linear-gradient(90deg, var(--tint-orange) 0 72px, transparent 72px); }
+.esc-row.l3 { background: linear-gradient(90deg, var(--tint-red) 0 72px, transparent 72px); }
+
+.esc-row.l1 .esc-lvl .num { color: var(--audit-controls); }
+.esc-row.l2 .esc-lvl .num { color: var(--audit-substantive); }
+.esc-row.l3 .esc-lvl .num { color: var(--audit-forensic); }
+
+.esc-row.l1 .esc-cell .gate-chip,
+.esc-row.l1 .esc-case { color: var(--audit-controls); }
+.esc-row.l2 .esc-cell .gate-chip,
+.esc-row.l2 .esc-case { color: var(--audit-substantive); }
+.esc-row.l3 .esc-cell .gate-chip,
+.esc-row.l3 .esc-case { color: var(--audit-forensic); }
+
+.esc-arrow {
+  display: flex; align-items: center; justify-content: center;
+  padding: 10px 0 2px;
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--ink-muted);
+}
+.esc-arrow::before,
+.esc-arrow::after {
+  content: ""; flex: 1; height: 1px; background: var(--rule-soft);
+  margin: 0 14px;
+}
+
+/* --- Figure 3: CS#1 timeline --- */
+.tl {
+  padding: 44px 56px 24px;
+}
+.tl-title {
+  font-size: 12px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--ink-muted);
+  margin-bottom: 4px;
+}
+.tl-sub {
+  font-family: var(--fig-serif);
+  font-size: 13px;
+  color: var(--ink-soft);
+  margin-bottom: 32px;
+  font-style: italic;
+}
+.tl-track {
+  position: relative;
+  height: 210px;
+  margin: 8px 40px 20px;
+}
+.tl-axis {
+  position: absolute;
+  top: 108px; left: 0; right: 0; height: 0;
+  border-top: 1.25px solid var(--rule);
+}
+.tl-tick {
+  position: absolute;
+  top: 96px;
+  width: 1px;
+  height: 24px;
+  background: var(--rule-soft);
+}
+.tl-tick.major { background: var(--rule); height: 30px; top: 93px; }
+.tl-tick .lab {
+  position: absolute;
+  top: 34px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: var(--fig-mono);
+  font-size: 11px;
+  color: var(--ink-muted);
+  white-space: nowrap;
+}
+.tl-tick.major .lab { color: var(--ink); font-weight: 500; }
+
+/* the 16-minute window band */
+.tl-window {
+  position: absolute;
+  top: 78px;
+  height: 60px;
+  background: var(--tint-orange);
+  border-left: 1.25px solid var(--audit-substantive);
+  border-right: 1.25px solid var(--audit-substantive);
+}
+.tl-window .wlab {
+  position: absolute;
+  top: -22px; left: 50%;
+  transform: translateX(-50%);
+  font-family: var(--fig-mono);
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  color: var(--audit-substantive);
+  white-space: nowrap;
+  text-transform: uppercase;
+}
+.tl-window .wnote {
+  position: absolute;
+  bottom: -46px; left: 50%;
+  transform: translateX(-50%);
+  max-width: 360px;
+  font-family: var(--fig-serif);
+  font-size: 11.5px;
+  line-height: 1.4;
+  font-style: italic;
+  color: var(--ink-muted);
+  text-align: center;
+}
+
+.tl-event {
+  position: absolute;
+  top: 96px;
+  transform: translateX(-50%);
+}
+.tl-event .marker {
+  width: 11px; height: 11px;
+  border: 1.5px solid var(--ink);
+  background: var(--paper);
+  margin: 0 auto;
+  transform: translateY(3px) rotate(45deg);
+}
+.tl-event.anchor .marker {
+  background: var(--ink);
+}
+.tl-event .card {
+  position: absolute;
+  width: 220px;
+  left: 50%; transform: translateX(-50%);
+  font-size: 11.5px;
+  line-height: 1.4;
+  color: var(--ink);
+  padding: 10px 12px 12px;
+  border: 1px solid var(--rule);
+  background: var(--paper);
+}
+.tl-event .card .when {
+  font-family: var(--fig-mono);
+  font-size: 11px;
+  color: var(--ink-muted);
+  margin-bottom: 4px;
+  letter-spacing: 0.02em;
+}
+.tl-event .card .what {
+  font-weight: 600;
+  font-size: 12px;
+  display: block;
+  margin-bottom: 3px;
+}
+.tl-event .card .detail {
+  font-size: 11px;
+  color: var(--ink-soft);
+  font-style: italic;
+  line-height: 1.4;
+}
+.tl-event.above .card { bottom: 32px; }
+.tl-event.above .connector {
+  position: absolute;
+  left: 50%; top: 0;
+  width: 1px; height: 32px;
+  background: var(--rule);
+}
+.tl-event.below .card { top: 32px; }
+.tl-event.below .connector {
+  position: absolute;
+  left: 50%; top: 8px;
+  width: 1px; height: 24px;
+  background: var(--rule);
+}
+
+.tl-gates {
+  margin: 56px 40px 10px;
+  padding-top: 18px;
+  border-top: 1px dashed var(--rule-soft);
+}
+.tl-gates-lead {
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-muted);
+  margin-bottom: 10px;
+}
+.tl-gate-list {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 8px;
+}
+.tl-gate {
+  border: 1px solid var(--rule-soft);
+  padding: 8px 10px 10px;
+  font-size: 11px;
+  line-height: 1.35;
+  color: var(--ink-soft);
+}
+.tl-gate .gid {
+  font-family: var(--fig-mono);
+  font-size: 11.5px;
+  color: var(--audit-controls);
+  font-weight: 500;
+  display: block;
+  margin-bottom: 3px;
+  letter-spacing: 0.02em;
+}
+.tl-gate.g7 .gid { color: var(--audit-substantive); }
+.tl-gate .gname {
+  font-family: var(--fig-serif);
+  font-style: italic;
+  color: var(--ink);
+}
+
+/* --- Figure 4: coverage honest-vs-reported --- */
+.cov {
+  padding: 44px 48px 24px;
+}
+.cov-title {
+  font-size: 12px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--ink-muted);
+  margin-bottom: 4px;
+}
+.cov-sub {
+  font-family: var(--fig-serif);
+  font-size: 13px;
+  color: var(--ink-soft);
+  margin-bottom: 36px;
+  font-style: italic;
+}
+.cov-chart {
+  display: grid;
+  grid-template-columns: 108px 1fr;
+  row-gap: 26px;
+  column-gap: 18px;
+  align-items: center;
+  margin: 0 20px;
+}
+.cov-label {
+  text-align: right;
+  padding-right: 4px;
+}
+.cov-label .who {
+  font-family: var(--fig-serif);
+  font-size: 13.5px;
+  font-weight: 600;
+  display: block;
+  line-height: 1.2;
+}
+.cov-label .sub {
+  font-family: var(--fig-mono);
+  font-size: 10.5px;
+  color: var(--ink-muted);
+  display: block;
+  margin-top: 3px;
+  letter-spacing: 0.02em;
+}
+.cov-bar-wrap {
+  position: relative;
+  height: 48px;
+  background: transparent;
+  border-bottom: 1px solid var(--rule-faint);
+}
+.cov-bar {
+  position: absolute;
+  left: 0; top: 4px; bottom: 8px;
+  border: 1.25px solid var(--ink);
+}
+.cov-bar.reported {
+  background: repeating-linear-gradient(
+    135deg,
+    rgba(214,39,40,0.10) 0 6px,
+    transparent 6px 12px
+  );
+  border-color: var(--audit-forensic);
+}
+.cov-bar.honest {
+  background: var(--tint-blue);
+  border-color: var(--audit-controls);
+}
+.cov-bar .pct {
+  position: absolute;
+  right: -6px; top: 50%;
+  transform: translate(100%, -50%);
+  font-family: var(--fig-mono);
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--ink);
+  white-space: nowrap;
+  padding-left: 10px;
+}
+.cov-bar.reported .pct { color: var(--audit-forensic); }
+.cov-bar.honest   .pct { color: var(--audit-controls); }
+.cov-bar .pct small {
+  font-family: var(--fig-serif);
+  font-style: italic;
+  font-size: 11.5px;
+  color: var(--ink-muted);
+  margin-left: 6px;
+  font-weight: 400;
+}
+.cov-axis {
+  position: relative;
+  margin: 6px 20px 0 126px;
+  height: 26px;
+  border-top: 1.25px solid var(--rule);
+}
+.cov-axis .atick {
+  position: absolute;
+  top: 0; width: 1px; height: 5px;
+  background: var(--rule);
+}
+.cov-axis .atick .al {
+  position: absolute;
+  top: 8px; left: 50%;
+  transform: translateX(-50%);
+  font-family: var(--fig-mono);
+  font-size: 10.5px;
+  color: var(--ink-muted);
+}
+.cov-delta {
+  margin: 22px 20px 0 126px;
+  padding: 14px 18px;
+  border: 1px solid var(--rule-soft);
+  border-left: 3px solid var(--audit-forensic);
+  display: grid;
+  grid-template-columns: auto 1fr;
+  column-gap: 18px;
+  align-items: center;
+}
+.cov-delta .big {
+  font-family: var(--fig-serif);
+  font-size: 28px;
+  font-weight: 500;
+  color: var(--audit-forensic);
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+.cov-delta .big sub {
+  font-family: var(--fig-mono);
+  font-size: 11px;
+  vertical-align: baseline;
+  color: var(--ink-muted);
+  margin-left: 4px;
+  font-weight: 400;
+}
+.cov-delta .txt {
+  font-size: 12.5px;
+  line-height: 1.45;
+  color: var(--ink-soft);
+}
+.cov-delta .txt b { color: var(--ink); font-weight: 600; }
+
+.cov-composition {
+  margin: 24px 20px 4px 126px;
+  padding-top: 18px;
+  border-top: 1px dashed var(--rule-soft);
+}
+.cov-composition .lead {
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-muted);
+  margin-bottom: 10px;
+}
+.cov-composition .note {
+  font-family: var(--fig-serif);
+  font-size: 11.5px;
+  font-style: italic;
+  color: var(--ink-muted);
+  margin-top: 10px;
+  line-height: 1.45;
+}
+.cov-omit {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+.cov-omit .omit {
+  border: 1px solid var(--rule-faint);
+  padding: 10px 12px;
+  font-size: 11.5px;
+  color: var(--ink-soft);
+}
+.cov-omit .omit .f {
+  font-family: var(--fig-mono);
+  font-size: 11px;
+  color: var(--ink);
+  display: block;
+  margin-bottom: 4px;
+  letter-spacing: -0.01em;
+}
+.cov-omit .omit .loc {
+  font-family: var(--fig-mono);
+  font-size: 10.5px;
+  color: var(--audit-forensic);
+}
+
+</style>
+
+<style>
+  html, body { margin: 0; padding: 0; background: #f0eee9; }
+  /* Source Serif 4 renders close enough to Computer Modern for arXiv
+     mock-up purposes; Charter stays the first fallback for users with
+     a system copy installed. */
+  :root {
+    --fig-serif: "Charter", "Source Serif 4", "Source Serif Pro",
+                 "STIX Two Text", "Cambria", "Georgia", Times, serif;
+  }
+
+  /* A tiny float nav in the corner so reviewers can jump figures without
+     losing zoom/pan state. Intentionally minimal. */
+  .mini-nav {
+    position: fixed; top: 18px; right: 18px; z-index: 50;
+    background: #fdfdfbee;
+    border: 1px solid rgba(0,0,0,0.12);
+    padding: 10px 14px;
+    font-family: var(--fig-serif);
+    font-size: 12px;
+    color: #3a4048;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+  }
+  .mini-nav .t {
+    font-variant: small-caps;
+    letter-spacing: 0.08em;
+    color: #101418;
+    margin-right: 10px;
+  }
+  .mini-nav a {
+    color: #1f77b4; text-decoration: none;
+    margin-right: 10px;
+    font-family: "JetBrains Mono", monospace;
+    font-size: 11px;
+  }
+  .mini-nav a:hover { text-decoration: underline; }
+  .mini-nav .hint {
+    display: block;
+    margin-top: 6px;
+    font-size: 10.5px;
+    color: #6b7380;
+    font-style: italic;
+  }
+</style>
+</head>
+<body>
+  <div id="root"></div>
+
+  <nav class="mini-nav">
+    <span class="t">CRUCIBLE figures</span>
+    <a href="#f1">Fig 1</a>
+    <a href="#f2">Fig 2</a>
+    <a href="#f3">Fig 3</a>
+    <a href="#f4">Fig 4</a>
+    <span class="hint">scroll · two-finger pan · pinch to zoom</span>
+  </nav>
+
+  <script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+
+  <script type="text/babel" id="design-canvas-src">
+
+// DesignCanvas.jsx — Figma-ish design canvas wrapper
+// Warm gray grid bg + Sections + Artboards + PostIt notes.
+// No assets, no deps.
+
+const DC = {
+  bg: '#f0eee9',
+  grid: 'rgba(0,0,0,0.06)',
+  label: 'rgba(60,50,40,0.7)',
+  title: 'rgba(40,30,20,0.85)',
+  subtitle: 'rgba(60,50,40,0.6)',
+  postitBg: '#fef4a8',
+  postitText: '#5a4a2a',
+  font: '-apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif',
+};
+
+// ─────────────────────────────────────────────────────────────
+// Main canvas — transform-based pan/zoom viewport
+//
+// Input mapping (Figma-style):
+//   • trackpad pinch  → zoom   (ctrlKey wheel; Safari gesture* events)
+//   • trackpad scroll → pan    (two-finger)
+//   • mouse wheel     → zoom   (notched; distinguished from trackpad scroll)
+//   • middle-drag / primary-drag-on-bg → pan
+//
+// Transform state lives in a ref and is written straight to the DOM
+// (translate3d + will-change) so wheel ticks don't go through React —
+// keeps pans at 60fps on dense canvases.
+// ─────────────────────────────────────────────────────────────
+function DesignCanvas({ children, minScale = 0.1, maxScale = 8, style = {} }) {
+  const vpRef = React.useRef(null);
+  const worldRef = React.useRef(null);
+  const tf = React.useRef({ x: 0, y: 0, scale: 1 });
+
+  const apply = React.useCallback(() => {
+    const { x, y, scale } = tf.current;
+    const el = worldRef.current;
+    if (el) el.style.transform = `translate3d(${x}px, ${y}px, 0) scale(${scale})`;
+  }, []);
+
+  React.useEffect(() => {
+    const vp = vpRef.current;
+    if (!vp) return;
+
+    const zoomAt = (cx, cy, factor) => {
+      const r = vp.getBoundingClientRect();
+      const px = cx - r.left, py = cy - r.top;
+      const t = tf.current;
+      const next = Math.min(maxScale, Math.max(minScale, t.scale * factor));
+      const k = next / t.scale;
+      // keep the world point under the cursor fixed
+      t.x = px - (px - t.x) * k;
+      t.y = py - (py - t.y) * k;
+      t.scale = next;
+      apply();
+    };
+
+    // Mouse-wheel vs trackpad-scroll heuristic. A physical wheel sends
+    // line-mode deltas (Firefox) or large integer pixel deltas with no X
+    // component (Chrome/Safari, typically multiples of 100/120). Trackpad
+    // two-finger scroll sends small/fractional pixel deltas, often with
+    // non-zero deltaX. ctrlKey is set by the browser for trackpad pinch.
+    const isMouseWheel = (e) =>
+      e.deltaMode !== 0 ||
+      (e.deltaX === 0 && Number.isInteger(e.deltaY) && Math.abs(e.deltaY) >= 40);
+
+    const onWheel = (e) => {
+      e.preventDefault();
+      if (isGesturing) return; // Safari: gesture* owns the pinch — discard concurrent wheels
+      if (e.ctrlKey) {
+        // trackpad pinch (or explicit ctrl+wheel)
+        zoomAt(e.clientX, e.clientY, Math.exp(-e.deltaY * 0.01));
+      } else if (isMouseWheel(e)) {
+        // notched mouse wheel — fixed-ratio step per click
+        zoomAt(e.clientX, e.clientY, Math.exp(-Math.sign(e.deltaY) * 0.18));
+      } else {
+        // trackpad two-finger scroll — pan
+        tf.current.x -= e.deltaX;
+        tf.current.y -= e.deltaY;
+        apply();
+      }
+    };
+
+    // Safari sends native gesture* events for trackpad pinch with a smooth
+    // e.scale; preferring these over the ctrl+wheel fallback gives a much
+    // better feel there. No-ops on other browsers. Safari also fires
+    // ctrlKey wheel events during the same pinch — isGesturing makes
+    // onWheel drop those entirely so they neither zoom nor pan.
+    let gsBase = 1;
+    let isGesturing = false;
+    const onGestureStart = (e) => { e.preventDefault(); isGesturing = true; gsBase = tf.current.scale; };
+    const onGestureChange = (e) => {
+      e.preventDefault();
+      zoomAt(e.clientX, e.clientY, (gsBase * e.scale) / tf.current.scale);
+    };
+    const onGestureEnd = (e) => { e.preventDefault(); isGesturing = false; };
+
+    // Drag-pan: middle button anywhere, or primary button starting on the
+    // canvas background (not inside an artboard).
+    let drag = null;
+    const onPointerDown = (e) => {
+      const onBg = e.target === vp || e.target === worldRef.current;
+      if (!(e.button === 1 || (e.button === 0 && onBg))) return;
+      e.preventDefault();
+      vp.setPointerCapture(e.pointerId);
+      drag = { id: e.pointerId, lx: e.clientX, ly: e.clientY };
+      vp.style.cursor = 'grabbing';
+    };
+    const onPointerMove = (e) => {
+      if (!drag || e.pointerId !== drag.id) return;
+      tf.current.x += e.clientX - drag.lx;
+      tf.current.y += e.clientY - drag.ly;
+      drag.lx = e.clientX; drag.ly = e.clientY;
+      apply();
+    };
+    const onPointerUp = (e) => {
+      if (!drag || e.pointerId !== drag.id) return;
+      vp.releasePointerCapture(e.pointerId);
+      drag = null;
+      vp.style.cursor = '';
+    };
+
+    vp.addEventListener('wheel', onWheel, { passive: false });
+    vp.addEventListener('gesturestart', onGestureStart, { passive: false });
+    vp.addEventListener('gesturechange', onGestureChange, { passive: false });
+    vp.addEventListener('gestureend', onGestureEnd, { passive: false });
+    vp.addEventListener('pointerdown', onPointerDown);
+    vp.addEventListener('pointermove', onPointerMove);
+    vp.addEventListener('pointerup', onPointerUp);
+    vp.addEventListener('pointercancel', onPointerUp);
+    return () => {
+      vp.removeEventListener('wheel', onWheel);
+      vp.removeEventListener('gesturestart', onGestureStart);
+      vp.removeEventListener('gesturechange', onGestureChange);
+      vp.removeEventListener('gestureend', onGestureEnd);
+      vp.removeEventListener('pointerdown', onPointerDown);
+      vp.removeEventListener('pointermove', onPointerMove);
+      vp.removeEventListener('pointerup', onPointerUp);
+      vp.removeEventListener('pointercancel', onPointerUp);
+    };
+  }, [apply, minScale, maxScale]);
+
+  const gridSvg = `url("data:image/svg+xml,%3Csvg width='120' height='120' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M120 0H0v120' fill='none' stroke='${encodeURIComponent(DC.grid)}' stroke-width='1'/%3E%3C/svg%3E")`;
+  return (
+    <div
+      ref={vpRef}
+      className="design-canvas"
+      style={{
+        height: '100vh', width: '100vw',
+        background: DC.bg,
+        overflow: 'hidden',
+        overscrollBehavior: 'none',
+        touchAction: 'none',
+        position: 'relative',
+        fontFamily: DC.font,
+        boxSizing: 'border-box',
+        ...style,
+      }}
+    >
+      <div
+        ref={worldRef}
+        style={{
+          position: 'absolute', top: 0, left: 0,
+          transformOrigin: '0 0',
+          willChange: 'transform',
+          width: 'max-content', minWidth: '100%',
+          minHeight: '100%',
+          padding: '60px 0 80px',
+          backgroundImage: gridSvg,
+          backgroundSize: '120px 120px',
+        }}
+      >
+        {children}
+      </div>
+    </div>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────
+// Section — title + subtitle + h-stack of artboards (no wrap)
+// ─────────────────────────────────────────────────────────────
+function DCSection({ title, subtitle, children, gap = 48 }) {
+  return (
+    <div style={{ marginBottom: 80, position: 'relative' }}>
+      <div style={{ padding: '0 60px 36px' }}>
+        <div style={{
+          fontSize: 22, fontWeight: 600, color: DC.title,
+          letterSpacing: -0.3, marginBottom: 4,
+        }}>{title}</div>
+        {subtitle && (
+          <div style={{
+            fontSize: 14, fontWeight: 400, color: DC.subtitle,
+          }}>{subtitle}</div>
+        )}
+      </div>
+      {/* h-stack — clips offscreen, never wraps */}
+      <div style={{
+        display: 'flex', gap, padding: '0 60px',
+        alignItems: 'flex-start', width: 'max-content',
+      }}>
+        {children}
+      </div>
+    </div>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────
+// Artboard — labeled card
+// ─────────────────────────────────────────────────────────────
+function DCArtboard({ label, children, width, height, style = {} }) {
+  return (
+    <div style={{ position: 'relative', flexShrink: 0 }}>
+      {label && (
+        <div style={{
+          position: 'absolute', bottom: '100%', left: 0,
+          paddingBottom: 8,
+          fontSize: 12, fontWeight: 500, color: DC.label,
+          whiteSpace: 'nowrap',
+        }}>{label}</div>
+      )}
+      <div style={{
+        borderRadius: 2,
+        boxShadow: '0 1px 3px rgba(0,0,0,0.08), 0 4px 16px rgba(0,0,0,0.06)',
+        overflow: 'hidden',
+        width, height,
+        background: '#fff',
+        ...style,
+      }}>
+        {children}
+      </div>
+    </div>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────
+// Post-it — absolute-positioned sticky note
+// ─────────────────────────────────────────────────────────────
+function DCPostIt({ children, top, left, right, bottom, rotate = -2, width = 180 }) {
+  return (
+    <div style={{
+      position: 'absolute', top, left, right, bottom, width,
+      background: DC.postitBg, padding: '14px 16px',
+      fontFamily: '"Comic Sans MS", "Marker Felt", "Segoe Print", cursive',
+      fontSize: 14, lineHeight: 1.4, color: DC.postitText,
+      boxShadow: '0 2px 8px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.08)',
+      transform: `rotate(${rotate}deg)`,
+      zIndex: 5,
+    }}>{children}</div>
+  );
+}
+
+Object.assign(window, { DesignCanvas, DCSection, DCArtboard, DCPostIt });
+
+
+</script>
+  <script type="text/babel" id="figures-src">
+// figures.jsx — CRUCIBLE Protocol arXiv figures (1, 2, 3, 4)
+
+// ─────────────────────────────────────────────────────────────
+// Figure 1 — The Quality Stack: three independent oracle layers
+// ─────────────────────────────────────────────────────────────
+function Figure1() {
+  return (
+    <div className="fig" style={{ width: 780 }}>
+      <div className="qstack">
+        <div className="qstack-title">Figure 1 — The Quality Stack</div>
+
+        {/* Layer 3 (top) — Human Oracle */}
+        <div className="qlayer human">
+          <div className="lnum">
+            <div className="roman">III</div>
+            <div className="lab">Last gate</div>
+          </div>
+          <div>
+            <div className="qname">Human Oracle</div>
+            <div className="qsub">“Does this feel right? Would I ship this?”</div>
+            <div className="qrun">Runner · founder / product owner · cold start</div>
+          </div>
+          <div className="qgates">
+            <span className="qchip muted">judgement</span>
+          </div>
+        </div>
+
+        {/* Layer 2 — CRUCIBLE (8 gates) */}
+        <div className="qlayer crucible">
+          <div className="lnum">
+            <div className="roman">II</div>
+            <div className="lab">Audit</div>
+          </div>
+          <div>
+            <div className="qname">CRUCIBLE &mdash; 8 gates</div>
+            <div className="qsub">
+              Quality <span className="mono">G1&ndash;G5, G7</span> &nbsp;·&nbsp;
+              Research-informed <span className="mono">G6</span> &nbsp;·&nbsp;
+              Integrity <span className="mono">G8</span>
+            </div>
+            <div className="qrun">
+              Runner · independent <span className="mono">CoS</span> · cross-machine enforced
+            </div>
+          </div>
+          <div className="qgates">
+            <span className="qchip c">G1</span>
+            <span className="qchip c">G2</span>
+            <span className="qchip c">G3</span>
+            <span className="qchip c">G4</span>
+            <span className="qchip c">G5</span>
+            <span className="qchip s">G6</span>
+            <span className="qchip s">G7</span>
+            <span className="qchip f">G8</span>
+          </div>
+        </div>
+
+        {/* Layer 1 (bottom) — CI */}
+        <div className="qlayer ci">
+          <div className="lnum">
+            <div className="roman">I</div>
+            <div className="lab">Pre-push</div>
+          </div>
+          <div>
+            <div className="qname">CI Gate</div>
+            <div className="qsub">“Tests run. Tests pass. No regressions.”</div>
+            <div className="qrun">Runner · automated pipeline</div>
+          </div>
+          <div className="qgates">
+            <span className="qchip muted">green / red</span>
+          </div>
+        </div>
+
+        {/* Legend — audit theory mapping */}
+        <div className="qstack-legend">
+          <div className="item">
+            <span className="sw" style={{ background: "var(--audit-controls)" }} />
+            <b>Controls</b> &nbsp;Gates 1&ndash;5 &mdash; preventive &amp; detective.
+          </div>
+          <div className="item">
+            <span className="sw" style={{ background: "var(--audit-substantive)" }} />
+            <b>Substantive</b> &nbsp;Gates 6&ndash;7 &mdash; mutation &amp; spec-traceability.
+          </div>
+          <div className="item">
+            <span className="sw" style={{ background: "var(--audit-forensic)" }} />
+            <b>Forensic</b> &nbsp;Gate 8 &mdash; audits the measurement system itself.
+          </div>
+        </div>
+      </div>
+
+      <div className="fig-caption">
+        <b>Figure 1.</b> The Quality Stack &mdash; three independent oracle layers. A green
+        CI gate (Layer I) does not imply clean CRUCIBLE (Layer II); clean CRUCIBLE does not
+        imply a Human Oracle pass (Layer III). All three are required. Colours encode the
+        audit-theory taxonomy of <em>Boynton et al.</em>&nbsp;[BOYNTON-2002] carried through
+        the remaining figures.
+      </div>
+    </div>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────
+// Figure 2 — Escalation taxonomy (L1 / L2 / L3)
+// ─────────────────────────────────────────────────────────────
+function Figure2() {
+  return (
+    <div className="fig" style={{ width: 1080 }}>
+      <div className="esc">
+        <div className="qstack-title" style={{ marginBottom: 14 }}>
+          Figure 2 &mdash; Escalation Taxonomy of Measurement Failure
+        </div>
+
+        <div className="esc-head">
+          <div>Level</div>
+          <div>Mechanism</div>
+          <div>Detection &amp; response</div>
+          <div>Case study</div>
+        </div>
+
+        {/* L1 */}
+        <div className="esc-row l1">
+          <div className="esc-lvl">
+            <div className="num">I</div>
+            <div className="tag">Accidental</div>
+          </div>
+          <div className="esc-cell">
+            <h4>Quality failure</h4>
+            <div className="body">
+              Structural gaps in test infrastructure. The team behaved correctly;
+              measurement was honest but tests were inadequate.
+            </div>
+          </div>
+          <div className="esc-cell">
+            <h4>Additive fix &mdash; improve tests</h4>
+            <div className="body">
+              Quality layer gates fire; directive &rarr; fix &rarr; re-audit.
+            </div>
+            <div className="detect">
+              <span className="gate-chip">G1</span>
+              <span className="gate-chip">G2</span>
+              <span className="gate-chip">G3</span>
+              <span className="gate-chip">G4</span>
+              <span className="gate-chip">G5</span>
+            </div>
+          </div>
+          <div className="esc-cell">
+            <h4>CS#1 &mdash; dx3</h4>
+            <div className="body">
+              Six gates fired on a silent <span className="mono">except: pass</span> over a
+              <span className="mono"> NOT NULL</span> violation; 3,277 tests remained green.
+            </div>
+            <div className="esc-case"><span className="dot" />2026-03-06</div>
+          </div>
+        </div>
+
+        <div className="esc-arrow">escalation &rarr;</div>
+
+        {/* L2 */}
+        <div className="esc-row l2">
+          <div className="esc-lvl">
+            <div className="num">II</div>
+            <div className="tag">Systematic</div>
+          </div>
+          <div className="esc-cell">
+            <h4>Metric manipulation</h4>
+            <div className="body">
+              Goodhart&rsquo;s-Law dynamics. Incremental optimisation for the coverage
+              metric via many locally-defensible edits, collectively fraudulent.
+            </div>
+          </div>
+          <div className="esc-cell">
+            <h4>Subtractive fix &mdash; remove false coverage</h4>
+            <div className="body">
+              Gate&nbsp;8 audit of the measurement configuration; real coverage baseline
+              restored.
+            </div>
+            <div className="detect">
+              <span className="gate-chip">G8.1</span>
+              <span className="gate-chip">G8.2</span>
+              <span className="gate-chip">G8.3</span>
+              <span className="gate-chip">G8.4</span>
+              <span className="gate-chip">G8.5</span>
+            </div>
+          </div>
+          <div className="esc-cell">
+            <h4>CS#2 &mdash; Podcast-Pipeline</h4>
+            <div className="body">
+              <span className="mono">pyproject.toml</span> omit list hid 1,145&nbsp;LOC;
+              reported 77% coverage &rarr; honest 15%.
+            </div>
+            <div className="esc-case"><span className="dot" />2026-03-07</div>
+          </div>
+        </div>
+
+        <div className="esc-arrow">escalation &rarr;</div>
+
+        {/* L3 */}
+        <div className="esc-row l3">
+          <div className="esc-lvl">
+            <div className="num">III</div>
+            <div className="tag">Structural</div>
+          </div>
+          <div className="esc-cell">
+            <h4>Oracle compromise</h4>
+            <div className="body">
+              A single architectural decision invalidates oracle independence across the
+              entire suite. No individual test is deficient.
+            </div>
+          </div>
+          <div className="esc-cell">
+            <h4>Architectural remediation</h4>
+            <div className="body">
+              Forensic sub-checks on <span className="mono">conftest.py</span>;
+              test-infrastructure rebuild &amp; Gate&nbsp;6 follow-up.
+            </div>
+            <div className="detect">
+              <span className="gate-chip">G8.6</span>
+              <span className="gate-chip">G8.7</span>
+            </div>
+          </div>
+          <div className="esc-cell">
+            <h4>CS#3 &mdash; dx3</h4>
+            <div className="body">
+              <span className="mono">asyncpg = AsyncMock()</span> at module scope in root
+              conftest: 4,726 tests claiming 100% coverage against a database not started
+              for three months.
+            </div>
+            <div className="esc-case"><span className="dot" />2026-03-17</div>
+          </div>
+        </div>
+      </div>
+
+      <div className="fig-caption">
+        <b>Figure 2.</b> Escalation taxonomy. Each level requires a qualitatively different
+        intervention: Level&nbsp;I fixes are <em>additive</em> (improve tests); Level&nbsp;II
+        fixes are <em>subtractive</em> (remove false coverage claims); Level&nbsp;III fixes
+        are <em>architectural</em> (restructure the test infrastructure). The taxonomy
+        predicts that governance systems addressing only Level&nbsp;I failures remain
+        vulnerable to Levels&nbsp;II and&nbsp;III under AI-assisted development.
+      </div>
+    </div>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────
+// Figure 3 — CS#1 timeline: directive-to-commit, 16 minutes
+// ─────────────────────────────────────────────────────────────
+function Figure3() {
+  // Only 3 confirmed events. Window 14:31 → 14:47 UTC; show a pre-pad before
+  // and a post-pad after for visual context without fabricating data.
+  // axis domain: 14:28 .. 14:50 (22 min window; each minute = ~4.09% of 100%)
+  const T0 = 14 * 60 + 28;           // 14:28
+  const T1 = 14 * 60 + 50;           // 14:50
+  const pct = (hhmm) => {
+    const t = 14 * 60 + hhmm;
+    return ((t - T0) / (T1 - T0)) * 100;
+  };
+
+  // major ticks every 2 minutes
+  const majorTicks = [28, 30, 32, 34, 36, 38, 40, 42, 44, 46, 48, 50];
+  const ticks = [];
+  for (let m = 28; m <= 50; m++) {
+    ticks.push({
+      m,
+      major: majorTicks.includes(m),
+      label: majorTicks.includes(m) ? `14:${String(m).padStart(2, "0")}` : null,
+    });
+  }
+
+  const gates = [
+    { id: "G1", name: "xfail governance", tone: "c" },
+    { id: "G2", name: "non-empty assertions", tone: "c" },
+    { id: "G3", name: "mock drift", tone: "c" },
+    { id: "G4", name: "test-count delta", tone: "c" },
+    { id: "G5", name: "silent exception", tone: "c" },
+    { id: "G7", name: "spec-test traceability", tone: "s", dashed: true },
+  ];
+
+  return (
+    <div className="fig" style={{ width: 980 }}>
+      <div className="tl">
+        <div className="tl-title">Figure 3 &mdash; Directive-to-Remediation Interval (CS#1)</div>
+        <div className="tl-sub">
+          Six-gate violation resolved in a 16-minute window. <span className="mono">dx3</span>, 2026-03-06 UTC.
+        </div>
+
+        <div className="tl-track">
+          {/* axis */}
+          <div className="tl-axis" />
+
+          {/* minute ticks */}
+          {ticks.map((t) => (
+            <div
+              key={t.m}
+              className={`tl-tick ${t.major ? "major" : ""}`}
+              style={{ left: `${pct(t.m)}%` }}
+            >
+              {t.label && <span className="lab">{t.label} UTC</span>}
+            </div>
+          ))}
+
+          {/* 16-minute window band */}
+          <div
+            className="tl-window"
+            style={{
+              left: `${pct(31)}%`,
+              width: `${pct(47) - pct(31)}%`,
+            }}
+          >
+            <div className="wlab">16-minute window</div>
+            <div className="wnote">
+              Six gates fired during this window; individual gate timestamps
+              not recorded in source audit log.
+            </div>
+          </div>
+
+          {/* Event 1 — directive injection 14:31 */}
+          <div className="tl-event anchor above" style={{ left: `${pct(31)}%` }}>
+            <div className="card">
+              <div className="when">14:31 UTC &mdash; t₀</div>
+              <span className="what">Directive injection</span>
+              <div className="detail">
+                NEXUS write timestamp; six-gate failure chain identified.
+              </div>
+            </div>
+            <div className="connector" />
+            <div className="marker" />
+          </div>
+
+          {/* Event 2 — remediation commit 14:47 */}
+          <div className="tl-event anchor above" style={{ left: `${pct(47)}%` }}>
+            <div className="card">
+              <div className="when">14:47 UTC &mdash; t₁</div>
+              <span className="what">Remediation commit</span>
+              <div className="detail">
+                Git commit timestamp; production-only fix, zero test weakening.
+              </div>
+            </div>
+            <div className="connector" />
+            <div className="marker" />
+          </div>
+        </div>
+
+        {/* Gate roster */}
+        <div className="tl-gates">
+          <div className="tl-gates-lead">
+            Gates implicated &mdash; six of eight &nbsp;·&nbsp;
+            <span style={{ textTransform: "none", letterSpacing: 0, fontStyle: "italic", color: "var(--ink-muted)" }}>
+              G6 &amp; G8 not implicated: coverage honest, scale below G6 threshold.
+            </span>
+          </div>
+          <div className="tl-gate-list">
+            {gates.map((g) => (
+              <div key={g.id} className={`tl-gate ${g.id === "G7" ? "g7" : ""}`}>
+                <span className="gid">
+                  {g.id}
+                  {g.dashed && <span style={{ color: "var(--ink-muted)", marginLeft: 6, fontSize: 10 }}>†</span>}
+                </span>
+                <span className="gname">{g.name}</span>
+              </div>
+            ))}
+          </div>
+          <div style={{ marginTop: 8, fontSize: 10.5, color: "var(--ink-muted)", fontStyle: "italic" }}>
+            † G7 retrospective &mdash; migration commit did not reference the column-type
+            specification had the gate existed.
+          </div>
+        </div>
+      </div>
+
+      <div className="fig-caption">
+        <b>Figure 3.</b> Directive-to-remediation interval for Case Study&nbsp;#1. Two
+        timestamps are drawn from primary evidence: the NEXUS directive-injection write
+        (<span className="mono">t₀</span> = 14:31&nbsp;UTC) and the remediation git commit
+        (<span className="mono">t₁</span> = 14:47&nbsp;UTC). The intervening sequence of
+        per-gate fires was not captured by the audit log and is therefore left unmarked
+        rather than interpolated.
+      </div>
+    </div>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────
+// Figure 4 — Coverage: reported 77% vs Gate-1-honest 15%
+// ─────────────────────────────────────────────────────────────
+function Figure4() {
+  // x axis: 0..100 %
+  const axTicks = [0, 20, 40, 60, 80, 100];
+  return (
+    <div className="fig" style={{ width: 860 }}>
+      <div className="cov">
+        <div className="cov-title">Figure 4 &mdash; Reported vs. Honest Coverage (CS#2)</div>
+        <div className="cov-sub">
+          Podcast-Pipeline, 2026-03-07. Removing the <span className="mono">pyproject.toml</span>{" "}
+          omit list dropped measured coverage from 77% to 15%.
+        </div>
+
+        <div className="cov-chart">
+          {/* Row 1 — README badge */}
+          <div className="cov-label">
+            <span className="who">README badge</span>
+            <span className="sub">coverage-badge.svg</span>
+          </div>
+          <div className="cov-bar-wrap">
+            <div className="cov-bar reported" style={{ width: "77%" }}>
+              <div className="pct">
+                77.0% <small>reported</small>
+              </div>
+            </div>
+          </div>
+
+          {/* Row 2 — Gate-1-honest */}
+          <div className="cov-label">
+            <span className="who">Gate 8 audit</span>
+            <span className="sub">omit list removed</span>
+          </div>
+          <div className="cov-bar-wrap">
+            <div className="cov-bar honest" style={{ width: "15%" }}>
+              <div className="pct">
+                15.0% <small>honest</small>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* axis */}
+        <div className="cov-axis">
+          {axTicks.map((t) => (
+            <div key={t} className="atick" style={{ left: `${t}%` }}>
+              <span className="al">{t}%</span>
+            </div>
+          ))}
+        </div>
+
+        {/* delta callout */}
+        <div className="cov-delta">
+          <div className="big">
+            &minus;62<span style={{ fontSize: 18, verticalAlign: "super" }}>pp</span>
+          </div>
+          <div className="txt">
+            <b>&minus;1,145&nbsp;LOC</b> excluded from measurement via{" "}
+            <span className="mono">[tool.coverage.run] omit</span> &nbsp;·&nbsp;{" "}
+            <b>66 hollow assertions</b> removed on audit &nbsp;·&nbsp;{" "}
+            <b>5 test files</b> dead-gated by an unset{" "}
+            <span className="mono">PYTEST_GPU</span> environment variable.
+          </div>
+        </div>
+
+        {/* composition breakdown — what the omit list actually hid */}
+        <div className="cov-composition">
+          <div className="lead">Excluded from measurement &mdash; 1,145 LOC of business logic</div>
+          <div className="cov-omit">
+            <div className="omit">
+              <span className="f">rvc_pipeline.py</span>
+              voice conversion
+              <span className="loc"> &nbsp;· 412 LOC</span>
+            </div>
+            <div className="omit">
+              <span className="f">whisper_engine.py</span>
+              ASR inference
+              <span className="loc"> &nbsp;· 387 LOC</span>
+            </div>
+            <div className="omit">
+              <span className="f">hunyuan_video.py</span>
+              video synthesis
+              <span className="loc"> &nbsp;· 346 LOC</span>
+            </div>
+          </div>
+          <div className="note">
+            Source: <span className="mono">pyproject.toml</span> omit list,
+            Podcast-Pipeline repository. Mock-everything integration tests (47{" "}
+            <span className="mono">@patch</span> decorators, 439 invocations) are
+            orthogonal to this measurement-integrity failure and are characterised
+            separately under Gate&nbsp;8.3.
+          </div>
+        </div>
+      </div>
+
+      <div className="fig-caption">
+        <b>Figure 4.</b> Reported vs. honest coverage for Case Study&nbsp;#2. The 77% figure
+        was the value displayed by the repository&rsquo;s README badge; the 15% figure is the
+        output of <span className="mono">coverage run</span> after the{" "}
+        <span className="mono">[tool.coverage.run] omit</span> list was removed. The three
+        excluded files below the chart constitute the core ML pipeline of the system
+        &mdash; 1,145&nbsp;LOC of business logic not measured.
+      </div>
+    </div>
+  );
+}
+
+Object.assign(window, { Figure1, Figure2, Figure3, Figure4 });
+
+</script>
+
+  <script type="text/babel">
+    function App() {
+      return (
+        <DesignCanvas>
+          {/* Row 1 — the two conceptual figures */}
+          <DCSection
+            title="Conceptual figures"
+            subtitle="Figures 1 & 2 — architecture of the protocol and its taxonomy of failure modes."
+            gap={56}
+          >
+            <DCArtboard
+              label="Figure 1 — Quality Stack (§7.1)"
+              width={780}
+              style={{ scrollMarginTop: 40 }}
+            >
+              <div id="f1"><Figure1 /></div>
+            </DCArtboard>
+
+            <DCArtboard
+              label="Figure 2 — Escalation Taxonomy (§7.1, §9.3)"
+              width={1080}
+            >
+              <div id="f2"><Figure2 /></div>
+            </DCArtboard>
+          </DCSection>
+
+          {/* Row 2 — the two evidence figures */}
+          <DCSection
+            title="Evidence figures"
+            subtitle="Figures 3 & 4 — primary data only: confirmed commit/write timestamps, recorded coverage values."
+            gap={56}
+          >
+            <DCArtboard
+              label="Figure 3 — Directive → Commit Interval (§4, §8.3)"
+              width={980}
+            >
+              <div id="f3"><Figure3 /></div>
+            </DCArtboard>
+
+            <DCArtboard
+              label="Figure 4 — Reported vs Honest Coverage (§5, §8)"
+              width={860}
+            >
+              <div id="f4"><Figure4 /></div>
+            </DCArtboard>
+          </DCSection>
+
+          {/* design-review sticky note */}
+          <DCPostIt top={110} left={1900} rotate={-3} width={220}>
+            Pass-5 rubric compliant: no
+            illustrative/invented data in Figs 3 & 4.
+            Okabe-Ito palette used for the
+            Controls / Substantive / Forensic
+            audit layers.
+          </DCPostIt>
+        </DesignCanvas>
+      );
+    }
+
+    ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+  </script>
+</body>
+</html>
