@@ -1,0 +1,6 @@
+# Sample target pyproject — deliberately contains a G8.1 coverage-omit defect.
+[tool.coverage.run]
+omit = [
+    "src/payments/engine.py",
+    "tests/*",
+]

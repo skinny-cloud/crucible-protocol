@@ -13,16 +13,19 @@ This repository is the machine-readable open standard accompanying the paper.
 
 ## The 8 Gates
 
+Gate names and IDs below match [`crucible-gates.yaml`](./crucible-gates.yaml)
+verbatim — the same IDs the `crucible` CLI prints.
+
 | Gate | Layer | Role |
 |---|---|---|
-| **G1** Coverage Configuration | Controls | Detect coverage gaming via excluded files / directories |
-| **G2** Mock Proliferation | Controls | Detect excessive mocking (test-against-mocks rather than behavior) |
-| **G3** Skip Rate | Controls | Detect tests silently skipped via env vars / markers |
-| **G4** Hollow Assertion | Controls | Detect assertions satisfied by correct **and** incorrect behavior |
-| **G5** Silent Failure | Controls | Detect exception swallowing (`except: pass`) patterns |
-| **G6** Mutation Sampling | Substantive | Detect systematic metric manipulation via mutation survival |
-| **G7** Spec-Test Traceability | Substantive | Detect tests with no corresponding specification claim |
-| **G8** Measurement Integrity | Forensic | Detect Goodhart's Law activation across the prior seven gates |
+| **G1** xfail Governance | Quality | Detect xfail/skip markers removed without a confirming CI run |
+| **G2** Non-Empty Result Assertions | Quality | Detect hollow asserts (`isinstance(x, list)` — an empty list passes vacuously) |
+| **G3** Mock Drift Detection | Quality | Detect mocks updated in the same commit as impl, with no spec justification |
+| **G4** Test-Count Delta | Quality | Detect undocumented test-count decreases (hidden test deletion) |
+| **G5** Silent Exception Audit | Quality | Detect exception swallowing (`except: pass`) that hides failures from tests |
+| **G6** Mutation Testing | Quality | Detect tests that survive all mutations (coverage without constraint) |
+| **G7** Spec-Test Traceability | Quality | Detect integration tests with no corresponding specification reference |
+| **G8** Coverage Integrity Audit | Measurement Integrity | Audit the measurement system itself (omits, env-gates, conftest mocks, badge, infra) — subchecks G8.1–G8.7 |
 
 Full specifications, detection commands, and pass/fail criteria in
 [`crucible-gates.yaml`](./crucible-gates.yaml).
@@ -41,20 +44,65 @@ CRUCIBLE audits the measurement system itself.
 
 ---
 
-## Quick Start
+## Quick Start — the `crucible` auditor (runnable)
+
+This repo ships a **functional reference auditor**: a `crucible` CLI that reads
+[`crucible-gates.yaml`](./crucible-gates.yaml) and executes each gate's real
+detection logic against a target repo, emitting a per-gate **PASS / FAIL / SKIP**
+report.
 
 ```bash
-# Read the machine-readable spec
-cat crucible-gates.yaml
+git clone https://github.com/nxtg-ai/crucible-protocol
+cd crucible-protocol
+pip install -e .                       # installs the `crucible` command (Python ≥3.9)
 
-# Render the figures from the paper
-cd docs
-node render_figures.mjs   # requires playwright >= 1.57
+crucible audit examples/known-bad      # -> VERDICT: FAIL (8 real violations caught)
+crucible audit examples/known-good     # -> VERDICT: PASS (clean target)
+crucible audit examples/known-bad --json   # machine-readable report
 ```
 
-Gates 1–5 can typically be run as shell one-liners against a target
-repository. Gates 6–8 require more setup — see `examples/` for sample
-implementations and `docs/` for the full paper.
+Or run the whole thing in one command (isolated venv, install, audit both
+fixtures, run the test suite):
+
+```bash
+./demo.sh        # or: make demo
+```
+
+### The three-state contract (load-bearing)
+
+A gate that cannot run in the target context reports **SKIP(reason)** — it
+**never** reports PASS. A tool that painted an un-runnable gate green would
+commit the very measurement fraud this protocol exists to detect. The summary
+counts SKIPs separately: `PASS 8/8 applicable, FAIL 0, SKIP 6`.
+
+### What each gate actually does
+
+| Gate(s) | Kind | What runs |
+|---|---|---|
+| G2, G5, G7, G8.2, G8.3, G8.6 | **static (AST)** | Python `ast` walk — multi-line bodies and commented-out checks do **not** fool it |
+| G8.1, G8.4 | **static (config)** | parse coverage config / README badge URL |
+| G1, G3, G4 | **git** | `git diff HEAD~1..HEAD` forensics — **SKIP** if target is not a git repo with history |
+| G6, G8.5, G8.7 | **shell-out** | `mutmut` / `pytest --cov` / `pg_isready` — **SKIP** if tool/service absent |
+
+The CLI follows the gate IDs in `crucible-gates.yaml` (G1=`xfail_governance`,
+G2=`non_empty_result_assertions`, …, G8.1–G8.7 = measurement-integrity
+subchecks). See the YAML for each gate's full spec.
+
+### Sample targets
+
+- [`examples/known-bad/`](./examples/known-bad) — a payments service with one
+  embedded defect per static gate (silent `except`, hollow `isinstance` assert,
+  unjustified coverage omit, `MagicMock` in an integration test, module-level
+  `asyncpg = AsyncMock()` in conftest, dead env-gated test, hardcoded coverage
+  badge, untraced integration tests).
+- [`examples/known-good/`](./examples/known-good) — the same surface, every
+  defect fixed; passes all static gates.
+
+### Render the paper figures
+
+```bash
+cd docs && node render_figures.mjs   # requires playwright >= 1.57
+```
 
 ---
 

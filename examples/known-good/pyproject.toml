@@ -1,0 +1,6 @@
+# Sample target pyproject — G8.1 clean: every omit is justified.
+[tool.coverage.run]
+omit = [
+    "src/payments/_generated_pb2.py",  # OMIT JUSTIFIED: auto-generated protobuf, no hand-written logic
+    "tests/*",
+]

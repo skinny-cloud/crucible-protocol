@@ -1,0 +1,11 @@
+name: ci
+on: [push]
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: pip install pytest
+      - run: pytest
+      # NOTE: RUN_DB_TESTS is intentionally NEVER set here -> the env-gated test
+      # in tests/integration/test_payments.py is dead code (G8.2).
