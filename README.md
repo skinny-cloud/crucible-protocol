@@ -52,7 +52,7 @@ detection logic against a target repo, emitting a per-gate **PASS / FAIL / SKIP*
 report.
 
 ```bash
-git clone https://github.com/nxtg-ai/crucible-protocol
+git clone https://github.com/skinny-cloud/crucible-protocol
 cd crucible-protocol
 pip install -e .                       # installs the `crucible` command (Python ≥3.9)
 
