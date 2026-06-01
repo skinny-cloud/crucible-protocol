@@ -181,3 +181,11 @@ Figure typography and initial conceptual framing produced with Claude Design
 applied pre-publication (see `docs/render_figures.mjs` comment blocks). The
 authors thank the research-preview reviewers who caught a fabricated data
 panel in an earlier figure draft.
+
+## Citation / DOI
+
+This repository is archived on Zenodo (CERN) for permanent, citeable access:
+
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.20485120.svg)](https://doi.org/10.5281/zenodo.20485120)
+
+> CRUCIBLE Protocol — reference implementation. Zenodo. https://doi.org/10.5281/zenodo.20485120
