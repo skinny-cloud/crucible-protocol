@@ -2,7 +2,7 @@
 
 **Code Review Under Conditions Inducing Bug Latency Exposure**
 
-A 9-gate audit protocol for detecting and preventing measurement fraud in
+An 8-gate audit protocol for detecting and preventing measurement fraud in
 AI-assisted software development. Distinguishes test-suite failures into three
 escalation levels — **accidental** (L1) → **systematic** (L2) → **structural**
 (L3) — and provides gate-level detection procedures for each.
@@ -11,13 +11,10 @@ This repository is the machine-readable open standard accompanying the paper.
 
 ---
 
-## The 9 Gates
+## The 8 Gates
 
-Gate names and IDs **G1–G8** match [`crucible-gates.yaml`](./crucible-gates.yaml)
-verbatim — the same IDs the `crucible` CLI prints. **G9** is a live-smoke
-verification gate the static auditor does not mechanize (it requires a *running*
-service and a *second* machine); it is specified below but has no static
-detector in the YAML.
+Gate names and IDs below match [`crucible-gates.yaml`](./crucible-gates.yaml)
+verbatim — the same IDs the `crucible` CLI prints.
 
 | Gate | Layer | Role |
 |---|---|---|
@@ -29,41 +26,17 @@ detector in the YAML.
 | **G6** Mutation Testing | Quality | Detect tests that survive all mutations (coverage without constraint) |
 | **G7** Spec-Test Traceability | Quality | Detect integration tests with no corresponding specification reference |
 | **G8** Coverage Integrity Audit | Measurement Integrity | Audit the measurement system itself (omits, env-gates, conftest mocks, badge, infra) — subchecks G8.1–G8.7 |
-| **G9** Typed-Provider Service-Body Smoke | Service-Body Correctness | Require a live cross-machine smoke of a typed/REST provider's real handler body — mocked unit tests pass over service-body runtime errors (NameError, bad import) they never execute |
 
-Full specifications, detection commands, and pass/fail criteria for **G1–G8** in
-[`crucible-gates.yaml`](./crucible-gates.yaml). **G9** is specified below.
+Full specifications, detection commands, and pass/fail criteria in
+[`crucible-gates.yaml`](./crucible-gates.yaml).
 
-### G9 — Typed-Provider Service-Body Smoke Gate
-
-G9 differs in kind from G1–G8: it is a **live verification gate**, not a static
-detector. The reference auditor cannot run it against a repository, because it
-requires a *running* typed/REST provider and a *second* machine to smoke it.
-It is therefore specified here but not mechanized in
-[`crucible-gates.yaml`](./crucible-gates.yaml) — the CLI reports no static gate
-for it.
-
-**Catches**: Service-body runtime errors (NameError, bad import, wrong code
-path) in a typed provider or cross-machine REST service — the kind that mocked
-unit tests pass straight over because they mock the service method itself, never
-executing the real handler body. **Effort**: S | **Priority**: P0.
-
-For any **typed provider or cross-machine REST service**, a live cross-machine
-smoke against the real running service (e.g. Tailscale `GET` from the consuming
-machine) is **required before the provider work is verified or closed**. Mocked
-unit tests do not satisfy this gate — they exercise the test's mock, not the
-service body, so a runtime error in the handler body ships green. The smoke
-(minimum) is: from the consuming machine, `curl` the live endpoint → assert
-HTTP 200 **plus** the canonical schema/fact-key **plus** a non-empty expected
-field. A 200 with the wrong shape is still a FAIL. This extends G8.7
-(infrastructure reachability — "is the service running?") to service-body
-correctness ("does the handler body actually execute end-to-end across
-machines?").
-
-**Evidence (dx3, 2026-05-26, Lane B provider)**: a `BACKLOG_SCHEMA_VERSION`
-NameError in the provider body passed **all 17 Lane B unit tests** (they mock
-the service method) and was caught **only** by the Tailscale smoke from the
-consuming machine — green unit tests over a broken service body.
+> **On live service-body verification.** Confirming that a *running* typed/REST
+> provider's real handler body executes correctly across machines — a live
+> cross-machine smoke (e.g. `curl` the endpoint from the consuming machine and
+> assert HTTP 200 plus the expected schema/shape) — is a deployment-time
+> verification step, not a static-analysis audit gate: it needs a running
+> service and a second machine, so it is out of scope for this repository's
+> static auditor. CRUCIBLE covers the eight statically-auditable gates above.
 
 ---
 

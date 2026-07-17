@@ -40,7 +40,7 @@ def _render_human(report: dict) -> str:
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(
         prog="crucible",
-        description="CRUCIBLE Protocol auditor — runs the mechanized gates (G1–G8) against a target repo.")
+        description="CRUCIBLE Protocol auditor — runs the 8 gates against a target repo.")
     sub = parser.add_subparsers(dest="command", required=True)
 
     pa = sub.add_parser("audit", help="audit a target directory")
