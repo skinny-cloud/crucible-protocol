@@ -2,8 +2,8 @@
 
 **Code Review Under Conditions Inducing Bug Latency Exposure**
 
-An 8-gate audit protocol for detecting and preventing measurement fraud in
-AI-assisted software development. Distinguishes test-suite failures into three
+The static-audit standard for CRUCIBLE, a nine-gate protocol for detecting and
+preventing measurement fraud in AI-assisted software development. Distinguishes test-suite failures into three
 escalation levels — **accidental** (L1) → **systematic** (L2) → **structural**
 (L3) — and provides gate-level detection procedures for each.
 
@@ -36,7 +36,9 @@ Full specifications, detection commands, and pass/fail criteria in
 > assert HTTP 200 plus the expected schema/shape) — is a deployment-time
 > verification step, not a static-analysis audit gate: it needs a running
 > service and a second machine, so it is out of scope for this repository's
-> static auditor. CRUCIBLE covers the eight statically-auditable gates above.
+> static auditor. This repository packages CRUCIBLE's eight statically-auditable
+> gates (G1–G8); the ninth gate (G9, live cross-machine service verification) is
+> execution-time and lives outside this static standard.
 
 ---
 
